@@ -1,0 +1,228 @@
+import math
+
+# Constants for players
+PLAYER_X = 'X'
+PLAYER_O = 'O'
+
+# Initialize the board
+def initialize_board():
+    return [[' ' for _ in range(3)] for _ in range(3)]
+
+# Print the current state of the board
+def print_board(board):
+    for row in board:
+        print('|'.join(row))
+        print('-' * 5)
+
+# Check if the game is over
+def is_game_over(board):
+    return check_winner(board, PLAYER_X) or check_winner(board, PLAYER_O) or is_board_full(board)
+
+# Check if the board is full
+def is_board_full(board):
+    return all(cell != ' ' for row in board for cell in row)
+
+# Check for a winner
+def check_winner(board, player):
+    # Check rows
+    for row in board:
+        if all(cell == player for cell in row):
+            return True
+    # Check columns
+    for col in range(3):
+        if all(board[row][col] == player for row in range(3)):
+            return True
+    # Check diagonals
+    if all(board[i][i] == player for i in range(3)) or all(board[i][2 - i] == player for i in range(3)):
+        return True
+    return False
+
+# Minimax algorithm
+def minimax(board, depth, is_maximizing):
+    if check_winner(board, PLAYER_X):
+        return -1
+    if check_winner(board, PLAYER_O):
+        return 1
+    if is_board_full(board):
+        return 0
+
+    if is_maximizing:
+        best_score = -math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == ' ':
+                    board[i][j] = PLAYER_O
+                    score = minimax(board, depth + 1, False)
+                    board[i][j] = ' '
+                    best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == ' ':
+                    board[i][j] = PLAYER_X
+                    score = minimax(board, depth + 1, True)
+                    board[i][j] = ' '
+                    best_score = min(score, best_score)
+        return best_score
+
+# Get the best move for the computer
+def get_best_move(board):
+    best_score = -math.inf
+    move = (-1, -1)
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == ' ':
+                board[i][j] = PLAYER_O
+                score = minimax(board, 0, False)
+                board[i][j] = ' '
+                if score > best_score:
+                    best_score = score
+                    move = (i, j)
+    return move
+
+# Main game loop
+def play_game():
+    board = initialize_board()
+    print("Welcome to Tic Tac Toe!")
+    print_board(board)
+
+    while not is_game_over(board):
+        # User move
+        user_move = input("Enter your move (row and column) separated by space (0, 1, 2): ")
+        row, col = map(int, user_move.split())
+        if board[row][col] != ' ':
+            print("Invalid move. Try again.")
+            continue
+        board[row][col] = PLAYER_X
+        print_board(board)
+
+        if is_game_over(board):
+            break
+
+        # Computer move
+        print("Computer's turn:")
+        row, col = get_best_move(board)
+        board[row][col] = PLAYER_O
+        print_board(board)
+
+    # Display the result
+    if check_winner(board, PLAYER_X):
+        print("Congratulations! You win!")
+    elif check_winner(board, PLAYER_O):
+        print("Computer wins! Better luck next time.")
+    else:
+        print("It's a tie!")
+
+# Start the game
+if __name__ == "__main__":
+    play_game()
+
+//Explanation
+
+This code is an implementation of the **Alpha-Beta Pruning** algorithm, commonly used in game tree scenarios, like in AI for two-player games (e.g., chess). The algorithm optimizes the **Minimax** algorithm by "pruning" branches that don't need to be explored, thus improving efficiency.
+
+Here's a breakdown of each part of the code with the theoretical concepts:
+
+### 1. `Node` Class Definition
+
+```python
+class Node:
+    def __init__(self, value, children=None):
+        self.value = value
+        self.children = children or []
+```
+
+- This defines a simple `Node` class to represent nodes in the game tree.
+  - Each `Node` has:
+    - `value`: The node’s value, which represents the utility score if it’s a leaf node.
+    - `children`: A list of child nodes, representing possible moves or game states from this point.
+
+In a game tree, nodes represent game states, and each child node represents a possible move leading to a new game state.
+
+### 2. Alpha-Beta Pruning Algorithm
+
+The **Alpha-Beta Pruning** algorithm is a variation of the **Minimax** algorithm. It reduces the number of nodes evaluated by the recursive search by pruning branches that won't affect the final decision. 
+
+The main parameters in the algorithm:
+- `alpha`: The best value that the maximizing player (usually the AI) can guarantee.
+- `beta`: The best value that the minimizing player (the opponent) can guarantee.
+- `is_maximizing_player`: A boolean indicating if the current move is for the maximizing player or minimizing player.
+
+Here's the function:
+
+```python
+def alpha_beta(node, depth, alpha, beta, is_maximizing_player):
+    if depth == 0 or not node.children:
+        return node.value
+```
+
+- **Base Case**:
+  - The function stops when the specified `depth` reaches 0, or the node has no children (it's a leaf node). At this point, it returns the node’s value, representing the terminal score for that game state.
+
+#### Maximizing Player's Turn
+
+```python
+    if is_maximizing_player:
+        best_value = float("-inf")
+        for child in node.children:
+            child_value = alpha_beta(child, depth - 1, alpha, beta, False)
+            best_value = max(best_value, child_value)
+            alpha = max(alpha, best_value)
+            if beta <= alpha:
+                break  # Prune the subtree
+        return best_value
+```
+
+- **Maximizing Player (AI)**:
+  - Sets `best_value` to negative infinity to initialize the worst possible score.
+  - Loops through each child node and recursively calls `alpha_beta` to evaluate the child’s value.
+  - `best_value` is updated to the maximum value between `best_value` and `child_value`.
+  - **Alpha Update**: `alpha` is updated to the maximum of `alpha` and `best_value`.
+  - **Pruning Condition**: If `beta <= alpha`, further exploration of this branch is abandoned because the minimizing player would avoid this branch.
+
+#### Minimizing Player's Turn
+
+```python
+    else:
+        best_value = float("inf")
+        for child in node.children:
+            child_value = alpha_beta(child, depth - 1, alpha, beta, True)
+            best_value = min(best_value, child_value)
+            beta = min(beta, best_value)
+            if beta <= alpha:
+                break  # Prune the subtree
+        return best_value
+```
+
+- **Minimizing Player (Opponent)**:
+  - Sets `best_value` to positive infinity for the worst score the minimizing player can get.
+  - Similar to the maximizing player, loops through child nodes and recursively calls `alpha_beta`.
+  - `best_value` is updated to the minimum between `best_value` and `child_value`.
+  - **Beta Update**: `beta` is updated to the minimum of `beta` and `best_value`.
+  - **Pruning Condition**: If `beta <= alpha`, further nodes are pruned because the maximizing player would not allow this branch.
+
+### Example Usage
+
+```python
+root = Node(None, [Node(3, [Node(5), Node(2), Node(9)]), Node(6, [Node(8), Node(4), Node(7)])])
+best_value = alpha_beta(root, 3, float("-inf"), float("inf"), True)
+print("Best value:", best_value)
+```
+
+- A game tree is defined with a `root` node having two main branches.
+- `alpha_beta` is called with:
+  - `root` node as the starting point.
+  - `depth` of 3 (how deep to search in the tree).
+  - `alpha` set to negative infinity and `beta` to positive infinity.
+  - `True` indicating that it’s the maximizing player’s turn.
+
+The algorithm will return the optimal `best_value` for the maximizing player by exploring only the necessary branches in the tree.
+
+### Time Complexity
+
+The time complexity for Alpha-Beta Pruning, with an optimal ordering of moves, is **O(b^(d/2))**, where:
+- `b` is the branching factor (average number of children per node).
+- `d` is the depth of the game tree.
+This is an improvement over the **O(b^d)** time complexity of the standard Minimax algorithm, as Alpha-Beta Pruning reduces the number of nodes evaluated by half.

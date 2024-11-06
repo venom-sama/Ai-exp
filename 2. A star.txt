@@ -1,0 +1,208 @@
+from collections import deque
+
+class Graph:
+    def __init__(self, adjacency_list):
+        self.adjacency_list = adjacency_list
+
+    def get_neighbors(self, v):
+        return self.adjacency_list[v]
+
+    def h(self, n):
+        H = {
+            'A': 1,
+            'B': 1,
+            'C': 1,
+            'D': 1
+        }
+        return H[n]
+
+    def a_star_algorithm(self, start_node, stop_node):
+        open_list = set([start_node])
+        closed_list = set([])
+        g = {}
+        g[start_node] = 0
+        parents = {}
+        parents[start_node] = start_node
+
+        while len(open_list) > 0:
+            n = None
+
+            for v in open_list:
+                if n is None or (g[v] + self.h(v) < g[n] + self.h(n)):
+                    n = v
+
+            if n is None:
+                print('Path does not exist!')
+                return None
+
+            if n == stop_node:
+                reconst_path = []
+                while parents[n] != n:
+                    reconst_path.append(n)
+                    n = parents[n]
+                reconst_path.append(start_node)
+                reconst_path.reverse()
+                print('Path found: {}'.format(reconst_path))
+                return reconst_path
+
+            for (m, weight) in self.get_neighbors(n):
+                if m not in open_list and m not in closed_list:
+                    open_list.add(m)
+                    parents[m] = n
+                    g[m] = g[n] + weight
+                else:
+                    if g[m] > g[n] + weight:
+                        g[m] = g[n] + weight
+                        parents[m] = n
+                        if m in closed_list:
+                            closed_list.remove(m)
+                            open_list.add(m)
+            open_list.remove(n)
+            closed_list.add(n)
+
+        print('Path does not exist!')
+        return None
+
+adjacency_list = {
+    'A': [('B', 1), ('C', 3), ('D', 7)],
+    'B': [('D', 5)],
+    'C': [('D', 12)]
+}
+
+graph1 = Graph(adjacency_list)
+graph1.a_star_algorithm('A', 'D')
+#o(b^d)
+
+
+
+//Explanations
+Certainly! The A* (A-Star) algorithm is a widely-used pathfinding and graph traversal algorithm. It is especially useful for finding the shortest path in a weighted graph, such as in maps or games. The A* algorithm combines the benefits of Dijkstra's algorithm and Best-First Search, ensuring it finds the optimal path if the heuristic is admissible (i.e., it never overestimates the distance to the goal).
+
+### **A* Algorithm Overview**
+
+The A* algorithm uses two main components to decide the next node to explore:
+1. **g(n)**: The actual cost from the start node to the current node `n`.
+2. **h(n)**: The heuristic estimate of the cost from `n` to the goal node (this estimate should never overestimate the actual cost to ensure optimality).
+
+The algorithm prioritizes nodes based on their **f(n)** value, which is calculated as:
+\[
+f(n) = g(n) + h(n)
+\]
+
+Where:
+- **g(n)** is the known cost from the start to node `n`.
+- **h(n)** is an estimate of the cost from `n` to the goal.
+
+The algorithm chooses nodes with the lowest `f(n)` values, which balances between exploring nodes that are close in terms of actual cost and those that seem promising based on the heuristic.
+
+### **A* Algorithm Steps**
+
+#### **Input**:
+- A graph (nodes and edges with weights).
+- A start node and a goal node.
+- A heuristic function `h(n)` that estimates the distance from any node `n` to the goal.
+
+#### **Output**:
+- The shortest path from the start to the goal, or a message indicating that no path was found.
+
+#### **Steps**:
+
+1. **Initialize**:
+   - Create a priority queue and insert the start node with its `f(start) = h(start)` value.
+   - Create dictionaries to store:
+     - `g_cost`: The actual cost from the start to each node (initialize `g_cost[start] = 0`).
+     - `f_cost`: The estimated total cost from the start to the goal through each node (`f_cost[start] = h(start)`).
+
+2. **Loop**:
+   - While the priority queue is not empty:
+     - Remove the node with the lowest `f_cost` from the queue (let's call it `current`).
+     - If `current` is the goal node, reconstruct and return the path (we’ll explain path reconstruction in the next steps).
+     - For each neighbor of `current`:
+       - Calculate the tentative `g_cost` for reaching this neighbor as:
+         \[
+         \text{tentative\_g\_cost} = g\_cost[\text{current}] + \text{cost(current, neighbor)}
+         \]
+       - If `tentative_g_cost` is less than the current `g_cost` of the neighbor:
+         - Update `g_cost[neighbor]` to `tentative_g_cost`.
+         - Calculate `f_cost[neighbor]` as:
+           \[
+           f\_cost[\text{neighbor}] = g\_cost[\text{neighbor}] + h(\text{neighbor})
+           \]
+         - Add or update the neighbor in the priority queue with the new `f_cost`.
+
+3. **Path Reconstruction**:
+   - Use a dictionary (e.g., `came_from`) to keep track of each node's parent.
+   - When the goal node is reached, backtrack through `came_from` from the goal to the start to reconstruct the path.
+
+4. **End Condition**:
+   - If the priority queue is empty and the goal hasn't been reached, return a message indicating that no path exists.
+
+---
+
+### **A* Algorithm Pseudocode**
+
+Here's the algorithm in pseudocode for better understanding.
+
+```plaintext
+A_Star_Search(graph, start, goal, heuristic):
+    g_cost = {}          // Dictionary for cost from start to each node
+    f_cost = {}          // Dictionary for estimated total cost from start to goal
+    g_cost[start] = 0
+    f_cost[start] = heuristic[start]
+    
+    priority_queue = PriorityQueue()
+    priority_queue.enqueue(start, f_cost[start])
+    came_from = {}       // Dictionary to store path information
+    
+    while priority_queue is not empty:
+        current = priority_queue.dequeue()  // Dequeue node with lowest f_cost
+        
+        if current == goal:
+            return reconstruct_path(came_from, start, goal)
+        
+        for each neighbor in graph[current]:
+            tentative_g_cost = g_cost[current] + cost(current, neighbor)
+            
+            if neighbor not in g_cost or tentative_g_cost < g_cost[neighbor]:
+                g_cost[neighbor] = tentative_g_cost
+                f_cost[neighbor] = g_cost[neighbor] + heuristic[neighbor]
+                came_from[neighbor] = current
+                priority_queue.enqueue(neighbor, f_cost[neighbor])
+                
+    return "No path found"  // If goal is not reachable
+
+reconstruct_path(came_from, start, goal):
+    path = []
+    current = goal
+    while current in came_from:
+        path.append(current)
+        current = came_from[current]
+    path.append(start)
+    return path[::-1]  // Reverse the path for start-to-goal order
+```
+
+---
+
+### **Explanation of the Pseudocode**
+
+- **g_cost** and **f_cost** dictionaries:
+  - `g_cost` keeps track of the cost from the start node to each visited node.
+  - `f_cost` is used to prioritize nodes in the queue based on the estimated total path cost.
+
+- **Priority Queue**:
+  - The priority queue stores nodes to be explored, prioritizing nodes with the lowest `f_cost`.
+
+- **Path Reconstruction**:
+  - The `came_from` dictionary records each node’s parent, allowing backtracking once the goal is reached to determine the full path.
+
+### **Example Heuristic**
+
+To give a sense of how the heuristic helps, suppose we have a grid with the start at the top left and the goal at the bottom right. A simple heuristic could be the "Manhattan Distance," which calculates the sum of horizontal and vertical distances between the nodes.
+
+### **Key Points**
+
+1. **Admissible Heuristic**: The heuristic must not overestimate the actual distance to ensure A* finds the optimal path.
+2. **Optimal Path**: A* guarantees the shortest path due to the balance between `g_cost` and `h(n)`.
+3. **Efficiency**: While A* is efficient and optimal, it can be memory-intensive as it stores all nodes it encounters.
+
+This combination of guaranteed optimality (given a good heuristic) and efficiency makes A* one of the most powerful pathfinding algorithms in AI. Let me know if you'd like more clarification on any part!

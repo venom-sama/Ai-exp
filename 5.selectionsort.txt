@@ -1,0 +1,141 @@
+def selection_sort(a):
+    for i in range(len(a)):
+        min_index=i
+        for j in range(i,len(a)):
+            if a[min_index]>a[j]:
+                min_index=j
+        a[i],a[min_index]=a[min_index],a[i]
+        print(f"Pass {i+1}=",a)
+
+a=[]
+n=int(input("Enter the size of array= "))
+for i in range(n):
+    mark=int(input("Enter the Numbers= "))
+    a.append(mark)
+print("Unsorted Array=",a)
+selection_sort(a)
+print("Sorted Array=",a)
+
+#o(n^2)
+
+
+
+
+
+
+//Explanation
+
+The code provided is an implementation of the **Selection Sort** algorithm, a simple sorting algorithm that repeatedly finds the minimum element from the unsorted part of the array and moves it to the sorted part. Here is a detailed explanation of the theory, algorithm, and a walkthrough of the code.
+
+---
+
+### Theory of Selection Sort
+
+**Selection Sort** is an in-place, comparison-based sorting algorithm that divides the input array into a sorted and an unsorted part. It works by:
+1. Finding the minimum element from the unsorted part of the array.
+2. Swapping it with the first element of the unsorted part.
+3. Expanding the sorted part by one element and repeating the process until the array is fully sorted.
+
+**Key Points**:
+- **Time Complexity**: \(O(n^2)\), where \(n\) is the number of elements in the array. This complexity arises from the nested loops — the outer loop iterates over each element, and the inner loop finds the minimum element in the remaining unsorted part.
+- **Space Complexity**: \(O(1)\), as Selection Sort only requires a constant amount of extra space.
+
+### Selection Sort Algorithm
+
+1. **Initialize**: Start from the first element of the array.
+2. **Find the Minimum Element**:
+   - For each position \(i\) in the array, search for the smallest element in the subarray from \(i\) to the end of the array.
+3. **Swap**:
+   - Swap the found minimum element with the element at position \(i\).
+4. **Repeat**:
+   - Move to the next position and repeat until the array is sorted.
+
+### Code Explanation and Walkthrough
+
+```python
+def selection_sort(a):
+    for i in range(len(a)):  # Outer loop iterates through each position in the array
+        min_index = i  # Initialize the index of the minimum element to the current position
+        for j in range(i, len(a)):  # Inner loop finds the minimum element in the unsorted part
+            if a[min_index] > a[j]:  # If a smaller element is found, update min_index
+                min_index = j
+        # Swap the found minimum element with the element at position i
+        a[i], a[min_index] = a[min_index], a[i]
+        print(f"Pass {i+1} =", a)  # Print the array after each pass for illustration
+
+# Code to take user input for the array
+a = []
+n = int(input("Enter the size of array= "))  # Input for array size
+for i in range(n):  # Input each element of the array
+    mark = int(input("Enter the Numbers= "))
+    a.append(mark)
+print("Unsorted Array=", a)  # Display the unsorted array
+
+selection_sort(a)  # Call the selection sort function
+print("Sorted Array=", a)  # Display the sorted array
+```
+
+---
+
+### Step-by-Step Execution
+
+Suppose the input array is `[64, 25, 12, 22, 11]`.
+
+1. **Initialize and Input Array**:
+   - The array is entered by the user, and we initialize an empty array, `a`.
+
+2. **First Pass** (Outer loop `i=0`):
+   - **Inner loop** finds the minimum element in `[64, 25, 12, 22, 11]` which is `11`.
+   - **Swap** `11` with `64`, resulting in `[11, 25, 12, 22, 64]`.
+   - Print: `Pass 1 = [11, 25, 12, 22, 64]`
+
+3. **Second Pass** (Outer loop `i=1`):
+   - **Inner loop** finds the minimum element in `[25, 12, 22, 64]` which is `12`.
+   - **Swap** `12` with `25`, resulting in `[11, 12, 25, 22, 64]`.
+   - Print: `Pass 2 = [11, 12, 25, 22, 64]`
+
+4. **Third Pass** (Outer loop `i=2`):
+   - **Inner loop** finds the minimum element in `[25, 22, 64]` which is `22`.
+   - **Swap** `22` with `25`, resulting in `[11, 12, 22, 25, 64]`.
+   - Print: `Pass 3 = [11, 12, 22, 25, 64]`
+
+5. **Fourth Pass** (Outer loop `i=3`):
+   - **Inner loop** finds the minimum element in `[25, 64]` which is `25`.
+   - No swap needed since `25` is already in the correct position.
+   - Print: `Pass 4 = [11, 12, 22, 25, 64]`
+
+6. **Fifth Pass** (Outer loop `i=4`):
+   - The last element is in the correct position.
+   - Print: `Pass 5 = [11, 12, 22, 25, 64]`
+
+---
+
+### Example Output
+
+If the user inputs `[64, 25, 12, 22, 11]`, the output will look like this:
+
+```
+Unsorted Array = [64, 25, 12, 22, 11]
+Pass 1 = [11, 25, 12, 22, 64]
+Pass 2 = [11, 12, 25, 22, 64]
+Pass 3 = [11, 12, 22, 25, 64]
+Pass 4 = [11, 12, 22, 25, 64]
+Pass 5 = [11, 12, 22, 25, 64]
+Sorted Array = [11, 12, 22, 25, 64]
+```
+
+---
+
+### Complexity Analysis
+
+- **Time Complexity**:
+  - **Best, Average, and Worst Case**: \(O(n^2)\), since for each element we potentially compare it to every other remaining element in the unsorted part of the array.
+- **Space Complexity**: \(O(1)\) because selection sort is an in-place sorting algorithm that only requires a constant amount of extra memory.
+
+### Key Points of Selection Sort
+
+- **Not Stable**: Selection Sort is not stable, meaning it may change the relative order of equal elements.
+- **In-Place**: No additional memory is used beyond a few variables.
+- **Inefficient for Large Arrays**: Due to its \(O(n^2)\) time complexity, it is not efficient for large datasets, making it more suitable for educational purposes or very small lists.
+
+Selection Sort is straightforward but generally not used for large arrays, where more efficient algorithms like **QuickSort** or **MergeSort** would be preferable.

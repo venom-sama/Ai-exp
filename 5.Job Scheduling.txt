@@ -1,0 +1,166 @@
+def printJobScheduling(arr, t):
+    # Length of array
+    n = len(arr)
+
+    # Sort all jobs according to decreasing order of profit
+    for i in range(n):
+        for j in range(n - 1 - i):
+            if arr[j][2] < arr[j + 1][2]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+
+    # To keep track of free time slots
+    result = [False] * t
+
+    # To store the result (Sequence of jobs)
+    job = ['-1'] * t
+
+    # Iterate through all given jobs
+    for i in range(len(arr)):
+        for j in range(min(t - 1, arr[i][1] - 1), -1, -1):
+            # Free slot found
+            if result[j] is False:
+                result[j] = True
+                job[j] = arr[i][0]
+                break
+
+    # Print the sequence
+    print(job)
+
+if __name__ == '__main__':
+    arr = [['a', 2, 100],  # Job Array
+           ['b', 1, 19],
+           ['c', 2, 27],
+           ['d', 1, 25],
+           ['e', 3, 15]]
+    print("Following is the maximum profit sequence of jobs")
+    # Function Call
+    printJobScheduling(arr, 3)
+
+
+
+//Explanation
+
+This code is an implementation of a **Job Scheduling Problem** where the goal is to maximize profit by scheduling jobs within a given number of time slots. Each job has a deadline and a profit, and we aim to select the most profitable jobs to complete within their deadlines, ensuring no two jobs overlap in the same time slot.
+
+---
+
+### Theory of Job Scheduling Problem
+
+In this version of the **Job Scheduling Problem**, each job has:
+- **A job ID** (for identification),
+- **A deadline** (by which it should be completed), and
+- **A profit** (rewarded if the job is completed within its deadline).
+
+The objective is to maximize the total profit by selecting jobs that can be completed within their deadlines. The approach used here is **Greedy**: the algorithm first selects the most profitable jobs, then places each job in the latest possible time slot before its deadline to maximize the chance of fitting in more jobs.
+
+### Algorithm Explanation
+
+1. **Sort Jobs by Profit**:
+   - First, all jobs are sorted in descending order based on their profit. The idea is to attempt scheduling the highest-profit jobs first to maximize total profit.
+   
+2. **Initialize Slot Availability**:
+   - A boolean array `result` keeps track of whether each time slot is free. This array has a length equal to the maximum available slots (`t`).
+   - Another array `job` is used to record which job is scheduled in each time slot.
+
+3. **Place Jobs in Slots**:
+   - For each job (starting from the most profitable):
+     - Attempt to place it in the latest available slot that is within its deadline.
+     - If a free slot is found within the job’s deadline, place the job in that slot and mark it as occupied.
+   
+4. **Output the Job Sequence**:
+   - Print the `job` array to show the sequence of jobs selected for maximum profit.
+
+---
+
+### Code Walkthrough
+
+Here’s a step-by-step breakdown of the code:
+
+```python
+def printJobScheduling(arr, t):
+    # Length of array
+    n = len(arr)
+
+    # Sort all jobs according to decreasing order of profit
+    for i in range(n):
+        for j in range(n - 1 - i):
+            if arr[j][2] < arr[j + 1][2]:  # Compare profits
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]  # Swap to sort in descending order
+```
+
+- **Sorting by Profit**: This sorts jobs in descending order based on profit, using a bubble sort approach. After this, the most profitable job is at the beginning of the list.
+
+```python
+    # To keep track of free time slots
+    result = [False] * t  # Array indicating if a slot is occupied
+
+    # To store the result (Sequence of jobs)
+    job = ['-1'] * t  # Array to store the job sequence
+```
+
+- **Initialize Slot Availability**: `result` keeps track of free/occupied slots, and `job` will eventually contain the scheduled jobs in the order of slots.
+
+```python
+    # Iterate through all given jobs
+    for i in range(len(arr)):
+        # Try to find a free slot for this job in reverse order from its deadline
+        for j in range(min(t - 1, arr[i][1] - 1), -1, -1):
+            # Free slot found
+            if result[j] is False:
+                result[j] = True  # Mark slot as occupied
+                job[j] = arr[i][0]  # Assign job ID to this slot
+                break
+```
+
+- **Schedule Jobs**: For each job (in descending profit order), the inner loop tries to place the job in the latest possible free slot that meets its deadline. If a suitable slot is found, the job is assigned to that slot, and the slot is marked as occupied.
+
+```python
+    # Print the sequence
+    print(job)
+```
+
+- **Output the Job Sequence**: The final job sequence is printed, showing the job order that maximizes profit.
+
+---
+
+### Example Execution
+
+```python
+if __name__ == '__main__':
+    arr = [['a', 2, 100],  # Job Array: [Job ID, Deadline, Profit]
+           ['b', 1, 19],
+           ['c', 2, 27],
+           ['d', 1, 25],
+           ['e', 3, 15]]
+    print("Following is the maximum profit sequence of jobs")
+    printJobScheduling(arr, 3)
+```
+
+**Explanation of the Input**:
+- `arr` is an array of jobs, where each job is represented by `[Job ID, Deadline, Profit]`.
+- `t` is the total number of slots available.
+
+### Expected Output
+
+```
+Following is the maximum profit sequence of jobs
+['c', 'a', 'e']
+```
+
+This output represents the sequence of jobs scheduled to maximize profit. Here, jobs 'c', 'a', and 'e' are selected based on their deadlines and profits, maximizing the total reward.
+
+---
+
+### Complexity Analysis
+
+- **Time Complexity**: \(O(n^2)\) due to the sorting process (bubble sort) and inner loops for job placement. With a more efficient sorting algorithm, the complexity can be reduced to \(O(n \log n)\).
+- **Space Complexity**: \(O(t)\) for the `result` and `job` arrays used to store slot availability and job sequence.
+
+### Summary
+
+The algorithm efficiently schedules jobs within their respective deadlines, maximizing the total profit by:
+1. Prioritizing jobs based on profit.
+2. Scheduling each job in the latest possible time slot before its deadline.
+3. Printing the sequence of selected jobs for maximum profit.
+
+This approach is commonly used in deadline-driven scheduling problems where the goal is to maximize a cumulative reward.

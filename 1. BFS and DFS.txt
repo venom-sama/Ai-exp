@@ -1,0 +1,286 @@
+# DFS Implementation using an adjacency list and recursion
+def dfs_recursive(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')  # Print node as part of traversal order
+    
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs_recursive(graph, neighbor, visited)
+
+# Example usage
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+print("DFS Traversal Order:")
+dfs_recursive(graph, 'A')
+
+
+from collections import deque
+
+# BFS Implementation using an adjacency list and a queue
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    
+    while queue:
+        node = queue.popleft()
+        print(node, end=' ')  # Print node as part of traversal order
+        
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+# Example usage
+print("\nBFS Traversal Order:")
+bfs(graph, 'A')
+
+
+
+//Algorithm 
+
+### **Depth First Search (DFS) Algorithm**
+
+DFS explores each branch of the graph as far as possible before backtracking.
+
+#### **Algorithm:**
+
+1. **Input**:
+   - An undirected graph represented as an adjacency list.
+   - A starting node.
+
+2. **Initialize**:
+   - Create an empty set called `visited` to keep track of visited nodes.
+
+3. **Recursive Function (DFS) for a Node**:
+   - Add the node to the `visited` set.
+   - For each `neighbor` of the current node:
+     - If `neighbor` is not in `visited`, recursively call the DFS function on `neighbor`.
+
+4. **Traversal**:
+   - Start DFS with the starting node and traverse through all reachable nodes.
+
+5. **Output**:
+   - Print or store nodes in the order they are visited.
+
+#### **Pseudocode**:
+```plaintext
+DFS(graph, start):
+    visited = {}  // Set to keep track of visited nodes
+    DFS_Visit(graph, start, visited)
+
+DFS_Visit(graph, node, visited):
+    visited.add(node)  // Mark the node as visited
+    print(node)  // Process the node (e.g., print or store it)
+    
+    for each neighbor in graph[node]:
+        if neighbor is not in visited:
+            DFS_Visit(graph, neighbor, visited)
+```
+
+---
+
+### **Breadth First Search (BFS) Algorithm**
+
+BFS explores nodes level by level, visiting all nodes at the present level before moving to the next level.
+
+#### **Algorithm:**
+
+1. **Input**:
+   - An undirected graph represented as an adjacency list.
+   - A starting node.
+
+2. **Initialize**:
+   - Create an empty set called `visited` to keep track of visited nodes.
+   - Create a queue and add the starting node to it.
+
+3. **Traversal**:
+   - While the queue is not empty:
+     - Remove the front node from the queue.
+     - Print or store the node as part of the traversal.
+     - For each `neighbor` of the current node:
+       - If `neighbor` is not in `visited`, mark it as visited and add it to the queue.
+
+4. **Output**:
+   - Print or store nodes in the order they are visited.
+
+#### **Pseudocode**:
+```plaintext
+BFS(graph, start):
+    visited = {}  // Set to keep track of visited nodes
+    queue = [start]  // Initialize the queue with the start node
+    visited.add(start)
+    
+    while queue is not empty:
+        node = queue.pop(0)  // Dequeue the front node
+        print(node)  // Process the node (e.g., print or store it)
+        
+        for each neighbor in graph[node]:
+            if neighbor is not in visited:
+                visited.add(neighbor)  // Mark neighbor as visited
+                queue.append(neighbor)  // Enqueue the neighbor
+```
+
+---
+
+### **Summary of Differences in Algorithms**
+
+- **DFS** uses a recursive or stack-based approach to traverse as deep as possible before backtracking.
+- **BFS** uses a queue to explore nodes level by level.
+
+Both algorithms can be used to traverse and explore graphs, and they have the same time complexity but different space requirements due to their approach (recursion stack for DFS vs. queue for BFS). Let me know if you need further clarification or an example!
+
+
+
+
+
+
+// Explanation
+
+### **Depth First Search (DFS) Code Explanation**
+
+DFS traverses a graph by going as deep as possible down each path before backtracking. In this example, we’re using an adjacency list to represent the graph and implementing DFS using recursion.
+
+#### Code:
+```python
+# DFS Implementation using an adjacency list and recursion
+def dfs_recursive(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')  # Print node as part of traversal order
+    
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs_recursive(graph, neighbor, visited)
+```
+
+#### Breakdown:
+
+1. **Function Definition and Parameters**:
+   - `dfs_recursive(graph, start, visited=None)`: This function takes in:
+     - `graph`: The graph represented as an adjacency list (a dictionary where each key is a node, and its value is a list of neighboring nodes).
+     - `start`: The starting node for traversal.
+     - `visited`: A set to keep track of visited nodes, initialized to `None` on the first call.
+
+2. **Base Case (Initialization)**:
+   - `if visited is None`: This checks if `visited` is uninitialized (i.e., on the first call).
+     - `visited = set()`: Initializes `visited` as an empty set to keep track of which nodes have already been visited.
+
+3. **Mark the Node as Visited and Print**:
+   - `visited.add(start)`: Marks the `start` node as visited by adding it to the `visited` set.
+   - `print(start, end=' ')`: Prints the current node to show the order of traversal.
+
+4. **Recursion for Each Neighbor**:
+   - `for neighbor in graph[start]`: Iterates over each neighbor of the current `start` node.
+   - `if neighbor not in visited`: Checks if a neighbor has already been visited.
+     - If not, it calls `dfs_recursive` again on the unvisited neighbor, continuing the depth-first traversal.
+
+5. **Example Graph and Execution**:
+   ```python
+   graph = {
+       'A': ['B', 'C'],
+       'B': ['A', 'D', 'E'],
+       'C': ['A', 'F'],
+       'D': ['B'],
+       'E': ['B', 'F'],
+       'F': ['C', 'E']
+   }
+   print("DFS Traversal Order:")
+   dfs_recursive(graph, 'A')
+   ```
+   - Starting from node 'A', DFS will print nodes in the order it visits them, going as deep as possible before backtracking.
+
+---
+
+### **Breadth First Search (BFS) Code Explanation**
+
+BFS traverses a graph by visiting all nodes at the current depth level before moving to nodes at the next depth level. We implement BFS using a queue to handle this level-by-level traversal.
+
+#### Code:
+```python
+from collections import deque
+
+# BFS Implementation using an adjacency list and a queue
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    
+    while queue:
+        node = queue.popleft()
+        print(node, end=' ')  # Print node as part of traversal order
+        
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+```
+
+#### Breakdown:
+
+1. **Importing Deque**:
+   - `from collections import deque`: Imports `deque`, a double-ended queue that efficiently supports adding/removing elements from both ends. This is ideal for BFS since we need a queue to process nodes level by level.
+
+2. **Function Definition and Parameters**:
+   - `bfs(graph, start)`: This function takes in:
+     - `graph`: The graph represented as an adjacency list.
+     - `start`: The starting node for traversal.
+
+3. **Initialize the Visited Set and Queue**:
+   - `visited = set()`: Initializes an empty set to keep track of visited nodes.
+   - `queue = deque([start])`: Initializes the queue with the starting node.
+   - `visited.add(start)`: Marks the `start` node as visited immediately.
+
+4. **Traversal Using Queue**:
+   - `while queue`: Loops as long as there are nodes in the queue.
+     - `node = queue.popleft()`: Removes the first node from the queue (FIFO order) and assigns it to `node`.
+     - `print(node, end=' ')`: Prints the current node to show the order of traversal.
+   
+5. **Add Neighbors to the Queue**:
+   - `for neighbor in graph[node]`: Iterates over each neighbor of the current `node`.
+   - `if neighbor not in visited`: Checks if the neighbor has not been visited.
+     - `visited.add(neighbor)`: Marks the neighbor as visited.
+     - `queue.append(neighbor)`: Adds the neighbor to the queue, ensuring it will be processed in a level-wise manner.
+
+6. **Example Graph and Execution**:
+   ```python
+   print("\nBFS Traversal Order:")
+   bfs(graph, 'A')
+   ```
+   - Starting from node 'A', BFS will print nodes in the order it visits them, processing each level of the graph before moving deeper.
+
+---
+
+### **Comparing DFS and BFS Traversal**
+
+Given the example graph:
+```python
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+```
+
+- **DFS Traversal Order** (starting from 'A'): `A B D E F C`
+- **BFS Traversal Order** (starting from 'A'): `A B C D E F`
+
+### **Time and Space Complexity**
+
+- Both **DFS and BFS** have a time complexity of \(O(V + E)\), where \(V\) is the number of vertices, and \(E\) is the number of edges.
+- The **space complexity**:
+  - **DFS** may need \(O(V)\) space for the recursion stack (in recursive implementations).
+  - **BFS** requires \(O(V)\) space for the queue.
+

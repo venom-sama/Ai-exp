@@ -1,0 +1,159 @@
+def is_safe(board, row, col, n):
+    # Check if it's safe to place a queen at board[row][col]
+    # Check the row
+    for i in range(col):
+        if board[row][i] == 1:
+            return False
+
+    # Check upper diagonal on the left side
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Check lower diagonal on the left side
+    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    return True
+
+def solve_n_queens(n):
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    solutions = []
+
+    def solve(col):
+        if col == n:
+            solution = ["".join("1" if cell == 1 else "." for cell in row) for row in board]
+            solutions.append(solution)
+            return
+        for row in range(n):
+            if is_safe(board, row, col, n):
+                board[row][col] = 1
+                solve(col + 1)
+                board[row][col] = 0
+
+    solve(0)
+    return solutions
+
+# Example usage for N-Queens with N=4
+n = 4
+solutions = solve_n_queens(n)
+for solution in solutions:
+    for row in solution:
+        print(row)
+    print()
+
+
+
+
+
+
+
+
+
+//Explanations 
+### Theory of N-Queens Problem
+
+The **N-Queens Problem** is a classic combinatorial problem in which the goal is to place N queens on an N x N chessboard such that no two queens can attack each other. This means that no two queens can be in the same row, column, or diagonal. The challenge lies in finding all possible ways to arrange these queens on the board while satisfying these conditions.
+
+**Problem Constraints**:
+1. Only one queen can occupy a given row, column, and diagonal.
+2. A solution exists only for `N >= 4`, as smaller boards don’t allow for non-conflicting queen placements.
+
+**Approach**:
+A common approach to solving the N-Queens problem is **backtracking**. This technique involves placing a queen in a column, checking if the placement is safe, and then moving on to the next column. If a placement in any column leads to a conflict, the algorithm backtracks to try a new position in the previous column, continuing this process until all queens are placed on the board.
+
+### Algorithm
+
+1. **Initialize the Board**:
+   - Create an `N x N` board filled with `0`s. A `0` indicates an empty cell, and a `1` will represent a queen.
+
+2. **Define Safety Check (`is_safe` function)**:
+   - To check if a queen can be safely placed at `board[row][col]`, do the following:
+     - Check all cells in the **same row up to column `col`**. If any cell has a queen (`1`), return `False`.
+     - Check the **upper-left diagonal** from `board[row][col]` to the start of the board. If any cell has a queen (`1`), return `False`.
+     - Check the **lower-left diagonal** from `board[row][col]` to the bottom of the board. If any cell has a queen (`1`), return `False`.
+   - If no queens are found in these checks, return `True`.
+
+3. **Define Backtracking Function (`solve` function)**:
+   - **Base Case**: If `col == N`, all queens have been successfully placed, so:
+     - Convert the `board` configuration to a list of strings (using `"1"` for queens and `"."` for empty cells).
+     - Add this configuration to the list of `solutions`.
+   - **Recursive Case**:
+     - For each row in the current column `col`:
+       - Use `is_safe` to check if placing a queen at `board[row][col]` is safe.
+       - If safe, place a queen by setting `board[row][col] = 1`.
+       - Recursively call `solve(col + 1)` to attempt to place queens in the next column.
+       - After returning from the recursive call (backtracking), remove the queen by setting `board[row][col] = 0`.
+
+4. **Return the Solutions**:
+   - After all recursive calls are completed, return the list of `solutions`, each containing an `N x N` grid representing a valid arrangement of queens.
+
+---
+
+### Code Explanation
+
+```python
+# Check if placing a queen at (row, col) is safe
+def is_safe(board, row, col, n):
+    # Check if any queen is in the same row to the left
+    for i in range(col):
+        if board[row][i] == 1:
+            return False
+
+    # Check if any queen is in the upper-left diagonal
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Check if any queen is in the lower-left diagonal
+    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Safe to place a queen here
+    return True
+
+# Solve the N-Queens problem for an N x N board
+def solve_n_queens(n):
+    board = [[0 for _ in range(n)] for _ in range(n)]  # Create an N x N board
+    solutions = []  # Store valid solutions
+
+    def solve(col):
+        # If all columns are filled, store the board configuration
+        if col == n:
+            solution = ["".join("1" if cell == 1 else "." for cell in row) for row in board]
+            solutions.append(solution)
+            return
+
+        # Try placing a queen in each row of the current column
+        for row in range(n):
+            if is_safe(board, row, col, n):  # Check if the cell is safe
+                board[row][col] = 1  # Place the queen
+                solve(col + 1)  # Recur to place queens in the next column
+                board[row][col] = 0  # Backtrack by removing the queen
+
+    solve(0)  # Start the recursion from the first column
+    return solutions
+
+# Example usage for N-Queens with N=4
+n = 4
+solutions = solve_n_queens(n)
+for solution in solutions:
+    for row in solution:
+        print(row)
+    print()
+```
+
+### Output
+
+For `N=4`, this code will output two valid solutions, showing each board configuration with `"1"` for queens and `"."` for empty cells.
+
+---
+
+### Complexity Analysis
+
+- **Time Complexity**: \(O(N!)\) in the worst case because for each queen placement, the function explores every row for each column and backtracks when conflicts arise.
+- **Space Complexity**: \(O(N^2)\) for the board and the recursive call stack.
+
+This algorithm efficiently solves the N-Queens problem using backtracking, finding all possible configurations for non-conflicting placements of queens.

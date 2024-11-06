@@ -1,0 +1,160 @@
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0 for column in range(vertices)] for row in range(vertices)]
+
+    def printSolution(self, dist):
+        print("Vertex \t Distance from Source")
+        for node in range(self.V):
+            print(node, "\t\t", dist[node])
+
+    def minDistance(self, dist, sptSet):
+        min = 1e7
+        for v in range(self.V):
+            if dist[v] < min and sptSet[v] == False:
+                min = dist[v]
+                min_index = v
+        return min_index
+
+    def dijkstra(self, src):
+        dist = [1e7] * self.V
+        dist[src] = 0
+        sptSet = [False] * self.V
+        for cout in range(self.V):
+            u = self.minDistance(dist, sptSet)
+            sptSet[u] = True
+            for v in range(self.V):
+                if (self.graph[u][v] > 0 and
+                        sptSet[v] == False and
+                        dist[v] > dist[u] + self.graph[u][v]):
+                    dist[v] = dist[u] + self.graph[u][v]
+        self.printSolution(dist)
+
+g = Graph(9)
+g.graph = [
+    [0, 4, 0, 0, 0, 0, 0, 8, 0],
+    [4, 0, 8, 0, 0, 0, 0, 11, 0],
+    [0, 8, 0, 7, 0, 4, 0, 0, 2],
+    [0, 0, 7, 0, 9, 14, 0, 0, 0],
+    [0, 0, 0, 9, 0, 10, 0, 0, 0],
+    [0, 0, 4, 14, 10, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 2, 0, 1, 6],
+    [8, 11, 0, 0, 0, 0, 1, 0, 7],
+    [0, 0, 2, 0, 0, 0, 6, 7, 0]
+]
+g.dijkstra(0)
+#o(v^2)
+
+
+
+
+
+
+
+
+
+
+//Explanation
+### Theory of Dijkstra's Algorithm
+
+**Dijkstra's Algorithm** is a popular algorithm for finding the shortest paths from a single source node to all other nodes in a weighted, non-negative graph. The algorithm operates by expanding the shortest known path to neighboring nodes step by step, updating paths as it finds shorter alternatives. It maintains a set of visited nodes (the shortest path tree set, or `sptSet`) to avoid recalculating paths for nodes whose shortest paths are already determined.
+
+**Key Concepts**:
+1. **Graph Representation**: The graph is represented as an adjacency matrix where each cell `graph[u][v]` holds the weight of the edge between vertices `u` and `v`. If there's no edge, the weight is zero.
+2. **Distance Array**: This array (`dist[]`) stores the minimum distance from the source node to each vertex.
+3. **Visited Set**: The algorithm maintains a set of nodes for which the shortest path is already found (the `sptSet` array).
+
+Dijkstra’s algorithm is efficient for dense graphs where all nodes have edges, but it only works with graphs that have non-negative weights. 
+
+### Algorithm
+
+1. **Initialize**:
+   - Set all distances in `dist[]` to a high number (indicating infinity) except for the source vertex, which is set to `0` since the distance to itself is zero.
+   - Mark all nodes as unvisited in `sptSet[]`.
+
+2. **Find Minimum Distance**:
+   - Select the vertex `u` with the minimum distance from `dist[]` that hasn’t been visited (not in `sptSet[]`).
+
+3. **Update Distance for Neighbors**:
+   - For each neighboring vertex `v` of `u`:
+     - Check if `v` is unvisited and the path from `u` to `v` (i.e., `dist[u] + graph[u][v]`) is shorter than the current `dist[v]`.
+     - If yes, update `dist[v]` to `dist[u] + graph[u][v]`.
+
+4. **Repeat Until All Nodes are Visited**:
+   - Continue the above steps until all vertices are processed and added to `sptSet`.
+
+5. **Output**:
+   - Print the distances from the source to all vertices in `dist[]`.
+
+---
+
+### Code Explanation
+
+```python
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices  # Number of vertices in the graph
+        # Adjacency matrix to store edge weights between vertices
+        self.graph = [[0 for column in range(vertices)] for row in range(vertices)]
+
+    # Utility function to print the shortest distance from the source to each vertex
+    def printSolution(self, dist):
+        print("Vertex \t Distance from Source")
+        for node in range(self.V):
+            print(node, "\t\t", dist[node])
+
+    # Helper function to find the vertex with the minimum distance
+    def minDistance(self, dist, sptSet):
+        min = 1e7  # Set to a high initial value (infinity)
+        for v in range(self.V):
+            # Find the smallest distance vertex not yet included in sptSet
+            if dist[v] < min and sptSet[v] == False:
+                min = dist[v]
+                min_index = v
+        return min_index
+
+    # Function to implement Dijkstra's algorithm
+    def dijkstra(self, src):
+        dist = [1e7] * self.V  # Initialize all distances to infinity
+        dist[src] = 0  # Distance to source is 0
+        sptSet = [False] * self.V  # Set all nodes as unvisited
+
+        for cout in range(self.V):
+            u = self.minDistance(dist, sptSet)  # Pick the minimum distance vertex
+            sptSet[u] = True  # Mark as visited
+
+            # Update distances of adjacent vertices of the chosen vertex
+            for v in range(self.V):
+                if (self.graph[u][v] > 0 and
+                    sptSet[v] == False and
+                    dist[v] > dist[u] + self.graph[u][v]):
+                    dist[v] = dist[u] + self.graph[u][v]  # Update distance to v
+
+        self.printSolution(dist)  # Output the final shortest path distances
+
+# Example Usage
+g = Graph(9)
+g.graph = [
+    [0, 4, 0, 0, 0, 0, 0, 8, 0],
+    [4, 0, 8, 0, 0, 0, 0, 11, 0],
+    [0, 8, 0, 7, 0, 4, 0, 0, 2],
+    [0, 0, 7, 0, 9, 14, 0, 0, 0],
+    [0, 0, 0, 9, 0, 10, 0, 0, 0],
+    [0, 0, 4, 14, 10, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 2, 0, 1, 6],
+    [8, 11, 0, 0, 0, 0, 1, 0, 7],
+    [0, 0, 2, 0, 0, 0, 6, 7, 0]
+]
+g.dijkstra(0)  # Run Dijkstra’s algorithm from vertex 0
+```
+
+### Explanation of Output
+
+The code calculates the shortest distance from the source vertex `0` to each vertex in the graph. The output displays each vertex's minimum distance from the source.
+
+### Complexity Analysis
+
+- **Time Complexity**: \(O(V^2)\), where \(V\) is the number of vertices, due to scanning the distance array in `minDistance` for each vertex.
+- **Space Complexity**: \(O(V)\) for storing distances, visited nodes, and the adjacency matrix.
+
+Dijkstra's algorithm is efficient and well-suited for graphs with non-negative weights.

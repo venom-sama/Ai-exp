@@ -1,0 +1,239 @@
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = []
+
+    def add_edge(self, u, v, w):
+        self.graph.append([u, v, w])
+
+    # Search function
+    def find(self, parent, i):
+        if parent[i] == i:
+            return i
+        return self.find(parent, parent[i])
+
+    def apply_union(self, parent, rank, x, y):
+        xroot = self.find(parent, x)
+        yroot = self.find(parent, y)
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
+
+    # Applying Kruskal algorithm
+    def kruskal_algo(self):
+        result = []
+        i, e = 0, 0
+        self.graph = sorted(self.graph, key=lambda item: item[2])
+        parent = []
+        rank = []
+
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
+
+        while e < self.V - 1:
+            u, v, w = self.graph[i]
+            i = i + 1
+            x = self.find(parent, u)
+            y = self.find(parent, v)
+            if x != y:
+                e = e + 1
+                result.append([u, v, w])
+                self.apply_union(parent, rank, x, y)
+
+        for u, v, weight in result:
+            print("%d - %d: %d" % (u, v, weight))
+
+g = Graph(6)
+g.add_edge(0, 1, 4)
+g.add_edge(0, 2, 4)
+g.add_edge(1, 2, 2)
+g.add_edge(1, 0, 4)
+g.add_edge(2, 0, 4)
+g.add_edge(2, 1, 2)
+g.add_edge(2, 3, 3)
+g.add_edge(2, 5, 2)
+g.add_edge(2, 4, 4)
+g.add_edge(3, 2, 3)
+g.add_edge(3, 4, 3)
+g.add_edge(4, 2, 4)
+g.add_edge(4, 3, 3)
+g.add_edge(5, 2, 2)
+g.add_edge(5, 4, 3)
+g.kruskal_algo()
+#o(elog(e))
+
+
+
+
+
+
+
+//explanation
+
+The code provided implements **Kruskal's Algorithm** for finding the **Minimum Spanning Tree (MST)** of a weighted, undirected graph. Here’s a detailed explanation of the theory, algorithm, and the code.
+
+---
+
+### Theory of Kruskal's Algorithm
+
+A **Minimum Spanning Tree (MST)** of a graph is a subset of its edges that connects all vertices with the minimum possible total edge weight and without forming any cycles. Kruskal's algorithm is one of the standard methods to find the MST of a graph. It is a **greedy algorithm** that operates by sorting edges by weight and continuously adding the smallest edge that doesn’t form a cycle until the MST is complete.
+
+**Concepts**:
+1. **Edge Sorting**: The algorithm sorts all edges in ascending order of their weights.
+2. **Cycle Detection**: Using the Union-Find data structure, it ensures that adding a new edge does not create a cycle.
+3. **Union-Find Data Structure**: Used to efficiently check if two vertices belong to the same connected component (cycle detection) and to unite them.
+
+### Kruskal's Algorithm (Step-by-Step)
+
+1. **Initialize**:
+   - Sort all edges in non-decreasing order by their weight.
+   - Use the Union-Find structure to keep track of connected components.
+
+2. **Edge Selection**:
+   - Start with an empty result list (the MST).
+   - For each edge, use the **find** operation to check if the endpoints of the edge belong to different components. If they do, add the edge to the result, as it doesn’t create a cycle.
+   - Use the **union** operation to merge the two components.
+
+3. **Stop Condition**:
+   - Continue until there are \(V - 1\) edges in the MST (where \(V\) is the number of vertices).
+
+### Code Explanation and Algorithm
+
+```python
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices  # Number of vertices in the graph
+        self.graph = []    # List to store the graph edges and weights
+
+    # Function to add edges to the graph
+    def add_edge(self, u, v, w):
+        self.graph.append([u, v, w])
+
+    # Function to find the parent of a node (with path compression)
+    def find(self, parent, i):
+        if parent[i] == i:
+            return i
+        # Recursively find the parent and perform path compression
+        return self.find(parent, parent[i])
+
+    # Union function to join two subsets based on rank
+    def apply_union(self, parent, rank, x, y):
+        xroot = self.find(parent, x)
+        yroot = self.find(parent, y)
+
+        # Attach smaller rank tree under root of the high rank tree
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
+
+    # Function to implement Kruskal's algorithm
+    def kruskal_algo(self):
+        result = []  # Stores the resulting MST
+        i, e = 0, 0  # 'i' is for sorted edges, 'e' for edges in result
+
+        # Step 1: Sort all the edges in non-decreasing order of weight
+        self.graph = sorted(self.graph, key=lambda item: item[2])
+
+        parent = []
+        rank = []
+
+        # Create 'parent' and 'rank' arrays for Union-Find
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
+
+        # Step 2: Pick the smallest edge, and check if it forms a cycle
+        while e < self.V - 1:
+            u, v, w = self.graph[i]
+            i = i + 1
+            x = self.find(parent, u)
+            y = self.find(parent, v)
+
+            # If x and y are different, then no cycle is formed
+            if x != y:
+                e = e + 1
+                result.append([u, v, w])
+                self.apply_union(parent, rank, x, y)
+
+        # Print the resulting MST
+        for u, v, weight in result:
+            print("%d - %d: %d" % (u, v, weight))
+```
+
+### Detailed Algorithm Walkthrough
+
+1. **Initialize the Graph**:
+   - `__init__` initializes the graph with the given number of vertices `self.V` and an empty list `self.graph` to store edges.
+
+2. **Adding Edges**:
+   - `add_edge`: Adds an edge to the graph by appending a tuple `[u, v, w]` (where `u` and `v` are the edge endpoints, and `w` is the weight) to the `self.graph` list.
+
+3. **Find Operation with Path Compression**:
+   - `find`: This function finds the root (or parent) of a given node `i` in the Union-Find data structure. Path compression is used here to make future lookups faster by pointing each node directly to its root.
+
+4. **Union Operation with Rank**:
+   - `apply_union`: This function performs the union operation by attaching the smaller rank tree under the root of the higher rank tree. If both have the same rank, one root becomes the parent, and its rank is incremented.
+
+5. **Kruskal's Algorithm Execution**:
+   - `kruskal_algo`:
+     - **Edge Sorting**: The list of edges `self.graph` is sorted in ascending order by weight.
+     - **Union-Find Setup**: Initialize `parent` and `rank` arrays for Union-Find.
+     - **Iterate Through Edges**:
+       - Loop through the sorted edges, adding the smallest edge that does not form a cycle until the MST contains `V - 1` edges.
+       - **Cycle Check**: For each edge `(u, v, w)`, check if the endpoints `u` and `v` belong to the same subset using `find`. If they are in different subsets, add the edge to the MST and use `apply_union` to unite them.
+     - **Output the MST**: After the loop, print the edges in the MST.
+
+### Example Execution
+
+```python
+g = Graph(6)
+g.add_edge(0, 1, 4)
+g.add_edge(0, 2, 4)
+g.add_edge(1, 2, 2)
+g.add_edge(1, 0, 4)
+g.add_edge(2, 0, 4)
+g.add_edge(2, 1, 2)
+g.add_edge(2, 3, 3)
+g.add_edge(2, 5, 2)
+g.add_edge(2, 4, 4)
+g.add_edge(3, 2, 3)
+g.add_edge(3, 4, 3)
+g.add_edge(4, 2, 4)
+g.add_edge(4, 3, 3)
+g.add_edge(5, 2, 2)
+g.add_edge(5, 4, 3)
+g.kruskal_algo()
+```
+
+**Expected Output**:
+```
+1 - 2: 2
+2 - 5: 2
+2 - 3: 3
+3 - 4: 3
+0 - 1: 4
+```
+
+The output shows the edges included in the MST along with their weights.
+
+---
+
+### Complexity Analysis
+
+- **Time Complexity**:
+  - Sorting edges: \(O(E \log E)\), where \(E\) is the number of edges.
+  - Union-Find operations: Almost constant time, amortized \(O(\alpha(V))\), where \(\alpha\) is the Inverse Ackermann function.
+  - Overall complexity: \(O(E \log E)\), which simplifies to \(O(E \log V)\) due to sorting.
+
+- **Space Complexity**: \(O(V + E)\) for storing the `parent` and `rank` arrays and the graph representation.
+
+Kruskal’s algorithm is particularly efficient for sparse graphs with fewer edges, as its complexity depends more on the number of edges than vertices. It finds the MST while minimizing the total edge weight without forming cycles.

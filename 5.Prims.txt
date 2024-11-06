@@ -1,0 +1,167 @@
+INF = 9999999
+V = 5
+G = [[0, 9, 75, 0, 0],
+     [9, 0, 95, 19, 42],
+     [75, 95, 0, 51, 66],
+     [0, 19, 51, 0, 31],
+     [0, 42, 66, 31, 0]]
+selected = [0, 0, 0, 0, 0]
+
+# Set the number of edges to 0
+no_edge = 0
+selected[0] = True
+
+# Print for edge and weight
+print("Edge : Weight\n")
+
+while no_edge < V - 1:
+    minimum = INF
+    x = 0
+    y = 0
+
+    for i in range(V):
+        if selected[i]:
+            for j in range(V):
+                if (not selected[j]) and G[i][j]:
+                    # Not in selected and there is an edge
+                    if minimum > G[i][j]:
+                        minimum = G[i][j]
+                        x = i
+                        y = j
+
+    print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
+    selected[y] = True
+    no_edge += 1
+#o(e log(v))
+
+
+
+
+//Explanation
+
+
+This code implements **Prim's Algorithm** to find the **Minimum Spanning Tree (MST)** of an undirected, weighted graph represented as an adjacency matrix. The MST of a graph is a subset of its edges that connects all vertices with the minimum total edge weight, ensuring no cycles.
+
+---
+
+### Theory of Prim's Algorithm
+
+Prim’s algorithm is a greedy algorithm used to find the Minimum Spanning Tree (MST) for a connected, undirected graph with weighted edges. The goal is to start from an arbitrary vertex and keep adding the smallest edge that connects a new vertex to the already constructed MST until all vertices are included. 
+
+The algorithm works as follows:
+1. Start with an arbitrary vertex.
+2. Select the smallest edge connecting a vertex in the MST to a vertex outside the MST.
+3. Repeat this process until all vertices are included in the MST.
+
+**Properties**:
+- The MST will have exactly \( V-1 \) edges if there are \( V \) vertices.
+- If there are multiple minimum edges available, any one can be chosen as long as the tree remains connected.
+
+### Algorithm Steps
+
+1. **Initialize**:
+   - Start from any arbitrary vertex (in this code, vertex `0`).
+   - Initialize an array `selected[]` to track which vertices are included in the MST.
+
+2. **Iterate to Build MST**:
+   - While the MST has fewer than \( V-1 \) edges:
+     - Select the smallest edge that connects a vertex in the MST to a vertex outside the MST.
+     - Mark the newly added vertex as included in the MST.
+   
+3. **Output**:
+   - Print each edge and its weight as it is added to the MST.
+
+---
+
+### Code Explanation
+
+```python
+INF = 9999999  # A large value representing infinity (no connection)
+V = 5  # Number of vertices
+# Adjacency matrix representing the graph with edge weights
+G = [[0, 9, 75, 0, 0],
+     [9, 0, 95, 19, 42],
+     [75, 95, 0, 51, 66],
+     [0, 19, 51, 0, 31],
+     [0, 42, 66, 31, 0]]
+
+selected = [0, 0, 0, 0, 0]  # Array to keep track of selected vertices in MST
+
+# Set the number of edges to 0 initially
+no_edge = 0
+selected[0] = True  # Start from the first vertex
+
+# Output header
+print("Edge : Weight\n")
+
+# While we haven't added V-1 edges (ensures the MST covers all vertices)
+while no_edge < V - 1:
+    minimum = INF  # Initialize minimum weight to a large value
+    x = 0  # Source vertex for the edge
+    y = 0  # Destination vertex for the edge
+
+    # Check all edges from vertices in the MST to those outside
+    for i in range(V):
+        if selected[i]:  # Check only if vertex i is in the MST
+            for j in range(V):
+                if (not selected[j]) and G[i][j]:  # Check only unselected vertices with an edge
+                    if minimum > G[i][j]:  # Find the minimum edge weight
+                        minimum = G[i][j]
+                        x = i  # Update source vertex
+                        y = j  # Update destination vertex
+
+    # Print the selected edge and its weight
+    print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
+    selected[y] = True  # Mark destination vertex as selected (now part of MST)
+    no_edge += 1  # Increment the count of edges in the MST
+```
+
+### Step-by-Step Explanation of the Code
+
+1. **Initialization**:
+   - `INF` is set to a large value, representing a lack of direct connection between vertices.
+   - The graph `G` is represented as a 2D list (adjacency matrix), where each cell `G[i][j]` holds the weight of the edge between vertex `i` and vertex `j`. If `G[i][j]` is `0`, there is no edge.
+   - `selected` is an array to track which vertices are part of the MST (starting with only vertex `0` as selected).
+
+2. **Building the MST**:
+   - `while no_edge < V - 1`: The loop runs until `V-1` edges are included in the MST, ensuring all vertices are connected.
+   - For each iteration:
+     - **Find the Minimum Edge**:
+       - Iterate over all vertices `i` in the MST (where `selected[i]` is `True`).
+       - For each `i`, check every vertex `j` that is not yet selected (`selected[j]` is `False`).
+       - If there is an edge from `i` to `j` (i.e., `G[i][j] != 0`), and the edge weight is less than the current minimum, update `minimum` to `G[i][j]`, and store `x = i` and `y = j`.
+     - **Add the Edge to the MST**:
+       - The smallest edge found, connecting `x` to `y`, is added to the MST.
+       - Print the edge (`x-y`) and its weight (`G[x][y]`).
+       - Mark `y` as selected by setting `selected[y] = True`.
+       - Increment `no_edge` to reflect the addition of a new edge.
+
+3. **Output**:
+   - Each iteration prints the next edge added to the MST and its weight.
+
+---
+
+### Example Execution and Output
+
+With the graph `G` defined in the code, an example output might look like this:
+
+```
+Edge : Weight
+
+0-1 : 9
+1-3 : 19
+3-4 : 31
+4-2 : 66
+```
+
+This output lists each edge in the MST, showing the vertices it connects and its weight. This is one possible MST for the given graph, though there may be others if multiple edges have the same weight.
+
+---
+
+### Complexity Analysis
+
+- **Time Complexity**: \(O(V^2)\), where \(V\) is the number of vertices, because in each iteration we scan through all vertices and edges in the adjacency matrix to find the minimum edge.
+  - The complexity of Prim’s algorithm using an adjacency matrix is \(O(V^2)\).
+- **Space Complexity**: \(O(V^2)\) for storing the adjacency matrix `G`.
+
+Prim's algorithm is efficient for dense graphs represented as an adjacency matrix but can be optimized using a priority queue or min-heap structure when implemented with an adjacency list, reducing the time complexity to \(O(E \log V)\).
